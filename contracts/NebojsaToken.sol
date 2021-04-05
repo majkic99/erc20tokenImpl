@@ -48,6 +48,7 @@ contract NebojsaToken is ERC20Token{
     function transferFrom(address _from, address _to, uint256 _value) public override returns (bool success){
         require(allowances[_from][msg.sender] >= _value);
         allowances[_from][msg.sender] -= _value;
+        balanceSheet[_from] -= _value;
         balanceSheet[_to] += _value;
         emit Transfer(_from, _to, _value);
         return true;

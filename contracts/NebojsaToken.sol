@@ -3,8 +3,21 @@ pragma solidity >=0.8.0 <0.9.0;
 import "./interfaces/ERC20Token.sol";
 contract NebojsaToken is ERC20Token{
 
-   mapping (address => uint) balanceSheet;
+    uint supply;
+    mapping (address => uint) balanceSheet;
     mapping (address => mapping (address => uint)) allowances;
+    mapping (address => bool) receivedFreeTokens;
+
+    event FaucetTurnedOn(address, uint);
+    function faucet(uint amount) public {
+        //amount requested must be less than one NebojsaToken
+        require(receivedFreeTokens[msg.sender] == false);
+        require(amount < 100000000);
+        receivedFreeTokens[msg.sender] = true;
+        balanceSheet[msg.sender] += amount;
+        supply += amount;
+        emit FaucetTurnedOn(msg.sender, amount);
+    }
     
     function name() public pure override returns (string memory){
         return 'NebojsaToken';
@@ -28,7 +41,7 @@ contract NebojsaToken is ERC20Token{
     
     function transfer(address _to, uint256 value) public override returns (bool success){
         require (balanceSheet[msg.sender] >= value);
-        balanceSheet[msg.sender] = 0;
+        balanceSheet[msg.sender] -= value;
         balanceSheet[_to] += value;
         emit Transfer(msg.sender, _to, value);
         return true;

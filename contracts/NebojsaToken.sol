@@ -27,8 +27,8 @@ contract NebojsaToken is ERC20Token{
         return 'NBTK';
     }
     
-    function totalSupply() public pure override returns (uint){
-        return 0;
+    function totalSupply() public view override returns (uint){
+        return supply;
     }
     
     function decimals() public pure override returns (uint8){

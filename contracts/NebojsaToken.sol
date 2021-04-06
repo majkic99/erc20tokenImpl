@@ -1,4 +1,4 @@
-pragma solidity ^0.8.3;
+pragma solidity ^0.8.0;
 // SPDX-License-Identifier: UNLICENSED
 import "./interfaces/ERC20Token.sol";
 
@@ -10,6 +10,11 @@ contract NebojsaToken is ERC20Token{
     mapping (address => bool) receivedFreeTokens;
 
     event FaucetTurnedOn(address, uint);
+
+    constructor(){
+
+    }
+
     function name() public pure override returns (string memory){
         return 'NebojsaToken';
     }

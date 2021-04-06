@@ -50,7 +50,7 @@ contract NebojsaToken is ERC20Token{
     }
 
     function transfer(address _to, uint256 value) public override returns (bool success){
-        //require (balanceSheet[msg.sender] >= value);
+        require (balanceSheet[msg.sender] >= value, 'Balance not enough');
         require(_to != address(0), 'Sending to bad address');
         balanceSheet[msg.sender] -= value;
         balanceSheet[_to] += value;

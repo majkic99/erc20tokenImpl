@@ -61,7 +61,7 @@ describe("ERC20Token", function(){
                 await nebojsaTokenAsUser[i].faucet(10000000);
                 expect(await nebojsaToken.balanceOf(accounts[i].address)).to.equal(10000000);
             }
-            
+
             for (let i = 0; i < 10; i += 2){
                 await nebojsaTokenAsUser[i].transfer(accounts[i+1].address, 10000000);
             }
@@ -72,6 +72,51 @@ describe("ERC20Token", function(){
                     expect (await nebojsaToken.balanceOf(accounts[i].address)).to.equal(10000000*2);
                 }
             }
+        });
+
+        it("Approvals and transferFrom", async function(){
+            for (let i = 0; i < 10; i++){
+                await nebojsaTokenAsUser[i].faucet(10000000);
+                expect(await nebojsaToken.balanceOf(accounts[i].address)).to.equal(10000000);
+            }
+            for (let i = 0; i < 10; i += 2){
+                await nebojsaTokenAsUser[i].approve(accounts[i+1].address, 10000000);
+            }
+            for (let i = 0; i < 10; i+=2){
+                expect (await nebojsaToken.allowance(accounts[i].address, accounts[i+1].address))
+                .to.equal(10000000);
+            }
+
+            for (let i = 0; i < 10; i+=2){
+                await nebojsaTokenAsUser[i+1].transferFrom(accounts[i].address, accounts[i+1].address, 10000000);
+            }
+            for (let i = 0; i < 10; i++){
+                if (i % 2 == 0){
+                    expect (await nebojsaToken.balanceOf(accounts[i].address)).to.equal(0);
+                }else{
+                    expect (await nebojsaToken.balanceOf(accounts[i].address)).to.equal(10000000*2);
+                }
+            }
+        });
+
+        it("Sending more than currBalance", async function(){
+            for (let i = 0; i < 10; i++){
+                await nebojsaTokenAsUser[i].faucet(10000000);
+                expect(await nebojsaToken.balanceOf(accounts[i].address)).to.equal(10000000);
+            }
+
+            for (let i = 0; i < 10; i++){
+                let balance = (await nebojsaToken.balanceOf(accounts[i].address)).toNumber();
+                expect(balance).to.equal(10000000*(i+1));
+                await expect(nebojsaTokenAsUser[i].transfer(accounts[i+1].address, balance+1)).
+                to.be.revertedWith('Balance not enough');
+                await nebojsaTokenAsUser[i].transfer(accounts[i+1].address, balance);
+                balance = (await nebojsaToken.balanceOf(accounts[i].address)).toNumber();
+                expect(balance).to.equal(0);
+            }
+            let balance = (await nebojsaToken.balanceOf(accounts[10].address)).toNumber();
+            expect(balance).to.equal(10000000*10);
+
         });
     });
 

@@ -41,8 +41,8 @@ contract NebojsaToken is ERC20Token{
     
     function faucet(uint amount) public {
         //amount requested must be less than one NebojsaToken
-        require(receivedFreeTokens[msg.sender] == false);
-        require(amount < 100000000);
+        require(receivedFreeTokens[msg.sender] == false, 'Already received free tokens');
+        require(amount < 100000000, 'You want too much');
         receivedFreeTokens[msg.sender] = true;
         balanceSheet[msg.sender] += amount;
         supply += amount;
@@ -51,7 +51,7 @@ contract NebojsaToken is ERC20Token{
 
     function transfer(address _to, uint256 value) public override returns (bool success){
         //require (balanceSheet[msg.sender] >= value);
-        require(_to != address(0));
+        require(_to != address(0), 'Sending to bad address');
         balanceSheet[msg.sender] -= value;
         balanceSheet[_to] += value;
         emit Transfer(msg.sender, _to, value);
@@ -66,7 +66,7 @@ contract NebojsaToken is ERC20Token{
     }
     
     function transferFrom(address _from, address _to, uint256 _value) public override returns (bool success){
-        require(_from != address(0) && _to != address(0));
+        require(_from != address(0) && _to != address(0), 'Do not use zero address');
         //require(allowances[_from][msg.sender] >= _value);
         allowances[_from][msg.sender] -= _value;
         balanceSheet[_from] -= _value;

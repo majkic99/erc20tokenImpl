@@ -9,16 +9,6 @@ contract NebojsaToken is ERC20Token{
     mapping (address => bool) receivedFreeTokens;
 
     event FaucetTurnedOn(address, uint);
-    function faucet(uint amount) public {
-        //amount requested must be less than one NebojsaToken
-        require(receivedFreeTokens[msg.sender] == false);
-        require(amount < 100000000);
-        receivedFreeTokens[msg.sender] = true;
-        balanceSheet[msg.sender] += amount;
-        supply += amount;
-        emit FaucetTurnedOn(msg.sender, amount);
-    }
-    
     function name() public pure override returns (string memory){
         return 'NebojsaToken';
     }
@@ -38,28 +28,40 @@ contract NebojsaToken is ERC20Token{
     function balanceOf(address _owner) public view override returns (uint){
         return balanceSheet[_owner];
     }
+
+    function allowance(address _owner, address _spender) public view override returns (uint) {
+        return allowances[_owner][_spender];
+    }
     
+    function faucet(uint amount) public {
+        //amount requested must be less than one NebojsaToken
+        require(receivedFreeTokens[msg.sender] == false);
+        require(amount < 100000000);
+        receivedFreeTokens[msg.sender] = true;
+        balanceSheet[msg.sender] += amount;
+        supply += amount;
+        emit FaucetTurnedOn(msg.sender, amount);
+    }
+
     function transfer(address _to, uint256 value) public override returns (bool success){
-        require (balanceSheet[msg.sender] >= value);
+        //require (balanceSheet[msg.sender] >= value);
+        require(_to != address(0));
         balanceSheet[msg.sender] -= value;
         balanceSheet[_to] += value;
         emit Transfer(msg.sender, _to, value);
         return true;
     }
-    
-    function allowance(address _owner, address _spender) public view override returns (uint) {
-        return allowances[_owner][_spender];
-    }
-    
+
     function approve(address _spender, uint256 _value) public override returns (bool success){
-        require (balanceSheet[msg.sender] >= _value);
+        //require (balanceSheet[msg.sender] >= _value);
         allowances[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
     
     function transferFrom(address _from, address _to, uint256 _value) public override returns (bool success){
-        require(allowances[_from][msg.sender] >= _value);
+        require(_from != address(0) && _to != address(0));
+        //require(allowances[_from][msg.sender] >= _value);
         allowances[_from][msg.sender] -= _value;
         balanceSheet[_from] -= _value;
         balanceSheet[_to] += _value;

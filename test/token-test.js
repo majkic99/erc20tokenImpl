@@ -89,6 +89,8 @@ describe("ERC20Token", function(){
 
             for (let i = 0; i < 10; i+=2){
                 await nebojsaTokenAsUser[i+1].transferFrom(accounts[i].address, accounts[i+1].address, 10000000);
+                await expect(nebojsaTokenAsUser[i].transferFrom(accounts[i+1].address, accounts[i+1].address, 10000000))
+                .to.be.revertedWith('Not enough allowance');
             }
             for (let i = 0; i < 10; i++){
                 if (i % 2 == 0){
@@ -108,8 +110,8 @@ describe("ERC20Token", function(){
             for (let i = 0; i < 10; i++){
                 let balance = (await nebojsaToken.balanceOf(accounts[i].address)).toNumber();
                 expect(balance).to.equal(10000000*(i+1));
-                await expect(nebojsaTokenAsUser[i].transfer(accounts[i+1].address, balance+1)).
-                to.be.revertedWith('Balance not enough');
+                await expect(nebojsaTokenAsUser[i].transfer(accounts[i+1].address, balance+1))
+                .to.be.revertedWith('Balance not enough');
                 await nebojsaTokenAsUser[i].transfer(accounts[i+1].address, balance);
                 balance = (await nebojsaToken.balanceOf(accounts[i].address)).toNumber();
                 expect(balance).to.equal(0);
